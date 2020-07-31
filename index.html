@@ -1,0 +1,46 @@
+<html>
+
+<head>
+    <title>Replay</title>
+    <link rel='stylesheet' href='style.css' />
+    <script src='javascript.js' type='text/javascript' defer></script>
+</head>
+
+<body>
+    <div id='controls_panel'>
+        <input id='setup' type='button' value='Setup' />
+        <input id='record' type='button' value='Record' disabled />
+        <input id='download' type='button' value='Download' disabled />
+        <hr />
+    </div>
+    <div id='settings_panel'>
+        <h1>Settings</h1>
+        <h2>Video</h2>
+        <label for='cursor'>Cursor</label>
+        <input id='cursor' type='button' value='Always' />
+        <hr />
+        <h2>Audio</h2>
+        <label for='echoCancellation'>Echo Cancellation</label>
+        <input id='echoCancellation' type='button' value='On' />
+        <label for='noiseSuppression'>Noise Suppression</label>
+        <input id='noiseSuppression' type='button' value='On' />
+    </div>
+    <div id='preview_panel'>
+        <h1>Preview</h1>
+        <div id='video_resize'>
+            <video id='preview'></video>
+        </div>
+        <h2>Audio Meter</h2>
+        <div id='metre'></div>
+    </div>
+    <div id='log_panel'>
+        <h1>Log</h1>
+        <span>Process post-download using ffmpeg for compression and wrapping.</span>
+        <pre id='log'></pre>
+    </div>
+    To Do: add gain to audiometer, reformat entire site, reformat timer, add in settings panel
+    Notes: output speaker level does not interfere with audio record
+
+</body>
+
+</html>

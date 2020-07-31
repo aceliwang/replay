@@ -1,0 +1,53 @@
+* {
+    font-family: "Helvetica";
+  }
+  
+  input {
+    display: inline-block;
+    margin: 5px;
+  }
+
+  video {
+    width: 100%;
+  }
+  
+  /* console logs */
+  
+  .error {
+    color: red;
+  }
+  
+  .warn {
+    color: orange;
+  }
+  
+  .info {
+    color: lightcoral;
+  }
+
+  #video_resize {
+    resize: both;
+    /* background-color: black; */
+    overflow: hidden;
+    width: 25%;
+  }
+
+  #preview_panel {
+    display: none;
+  }
+
+  #controls_panel {
+    position: fixed;
+    top: 0px;
+    background-color: white;
+    width: 100%;
+  }
+
+  #settings_panel {
+    margin-top: 50px;
+  }
+
+  #metre {
+    height: 5px;
+    background-color: black;
+  }
