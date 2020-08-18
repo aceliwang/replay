@@ -116,8 +116,8 @@ h1 {
   }
 
   #log {
-    padding: 1vh 3vh;
-    height: 15vh;
+    padding: 1vh 0vh 3vh 1vh;
+    height: 9vh;
     overflow: auto;
     width: 100%;
     display:inline-block;
