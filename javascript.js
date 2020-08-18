@@ -1,21 +1,46 @@
-const logNode = document.getElementById('log');
-const videoNode = document.getElementById('preview');
+// buttons
 const setupButton = document.getElementById('setup');
 const recordButton = document.getElementById('record');
 const downloadButton = document.getElementById('download');
+const settingsButton = document.getElementById('settings');
+const infoButton = document.getElementById('info');
+// divs
 const videoDiv = document.getElementById('video_resize')
 const previewPanel = document.getElementById('preview_panel')
 const controlPanel = document.getElementById('controls_panel')
+const settingsPanel = document.getElementById('settings_panel')
+const infoPanel = document.getElementById('info_panel')
+// components + forms
+const logNode = document.getElementById('log');
+const videoNode = document.getElementById('preview');
 const audioMetreBar = document.getElementById('metre')
+const audioGain = document.getElementById('gain')
+// log
 console.log = msg => logNode.innerHTML = `${msg}<br>` + logNode.innerHTML;
-console.error = msg => `<br><span class='error'>${msg}</span><br>` + logNode.innerHTML;
+console.error = msg => logNode.innerHTML = `<br><span class='error'>${msg}</span><br>` + logNode.innerHTML;
 console.warn = msg => `<br><span class='warn'>${msg}<span><br>` + logNode.innerHTML;
-console.info = msg => `<br><span class='info'>${msg}</span><br>` + logNode.innerHTML;
+console.info = msg => logNode.innerHTML = `<br><span class='info'>${msg}</span><br>` + logNode.innerHTML;
+// variables
+var mediaRecorder;
+var recordedBlobs;
+var mediaStream;
+var timer;
 
-let mediaRecorder;
-let recordedBlobs;
-let mediaStream;
-let timer;
+settingsButton.onclick = function () {
+    if (settingsPanel.style.display === 'none') {
+        settingsPanel.style.display = 'block'
+    } else if (settingsPanel.style.display === 'block') {
+        settingsPanel.style.display = 'none'
+    }
+}
+
+infoButton.onclick = function () {
+    if (infoPanel.style.display === 'none') {
+        infoPanel.style.display = 'block'
+    } else if (infoPanel.style.display === 'block') {
+        infoPanel.style.display = 'none'
+    }
+}
 
 setupButton.onclick = function () {
     let options = parseOptions();
@@ -56,15 +81,24 @@ videoDiv.onmouseup = function () {
     }
 }
 
+// https://developer.mozilla.org/en-US/docs/Web/API/MediaStreamConstraints
 function parseOptions() {
     var displayMediaOptions = {
         audio: {
+            // echoCancellation: document.getElementById('echoCancellation').value(),
             echoCancellation: true,
             noiseSuppression: true,
             sampleRate: 44100,
         },
         video: {
-            cursor: 'always'
+            cursor: 'always',
+            frameRate: 120,
+            aspectRatio: 3.2,
+            height: 320,
+            width: 320,
+// MONITOR
+    // if width + height + aspectRatio: width takes priority
+    //
         }
     };
     return displayMediaOptions;
@@ -72,28 +106,34 @@ function parseOptions() {
 
 function logInfo() {
     let videoTrack = videoNode.srcObject.getVideoTracks()[0];
-    console.info('Track settings:');
     console.info(JSON.stringify(videoTrack.getSettings(), null, 2));
-    console.info('Track constraints:');
+    console.info('Track settings:');
     console.info(JSON.stringify(videoTrack.getConstraints(), null, 2));
+    console.info('Track constraints:');
 }
 
 function audioMetre() {
-    let audioCtx = new window.AudioContext();
-    let analyser = audioCtx.createAnalyser();
-    let stream = audioCtx.createMediaStreamSource(mediaStream);
-    stream.connect(analyser);
-    analyser.fftSize = 2048;
-    let bufferLength = analyser.frequencyBinCount;
-    let dataArray = new Uint8Array(bufferLength);
-    // console.log(dataArray)
-    audioMetreBar.style.width = videoNode.clientWidth + 'px';
-    setInterval(function () {
-        analyser.getByteTimeDomainData(dataArray)
-        let max = dataArray.sort()[dataArray.length - 1]
-        audioMetreBar.style.width = ((max - 128) / 128) * videoNode.clientWidth + 'px'
+    try {
+        let audioCtx = new window.AudioContext();
+        let analyser = audioCtx.createAnalyser();
+        let stream = audioCtx.createMediaStreamSource(mediaStream);
+        stream.connect(analyser);
+        analyser.fftSize = 2048;
+        let bufferLength = analyser.frequencyBinCount;
+        let dataArray = new Uint8Array(bufferLength);
+        setInterval(function () {
+            analyser.getByteTimeDomainData(dataArray)
+            let max = dataArray.sort()[dataArray.length - 1]
+            audioMetreBar.style.width = Math.min(1, audioGain.value * (max - 128) / 128) * videoNode.clientWidth + 'px'
+        }
+            , 50)
+    } catch (error) {
+        console.log(error)
+        console.log("hello")
+        return
     }
-        , 50)
+    // audioMetreBar.style.width = videoNode.clientWidth + 'px';
+    
 }
 
 async function startCapture(displayMediaOptions) {
@@ -101,7 +141,7 @@ async function startCapture(displayMediaOptions) {
     let previewVideo = document.getElementById('preview');
     try {
         captureStream = await navigator.mediaDevices.getDisplayMedia(
-            displayMediaOptions
+            parseOptions()
         );
         previewVideo.srcObject = captureStream;
         mediaStream = captureStream;
@@ -133,11 +173,15 @@ function startRecording() {
     mediaRecorder.ondataavailable = handleDataAvailable;
     mediaRecorder.start();
     console.log('Recording started.');
+    let startTime = Date.now()
     var a = document.createElement('span');
-    a.innerHTML = 0
     controlPanel.appendChild(a);
     timer = setInterval(function () {
-        a.innerHTML = Number(a.innerHTML) + 1
+        let duration = Math.round((Date.now() - startTime) / 1000)
+        let seconds = ('0' + duration % 60).slice(-2)
+        let minutes = ('0' + Math.floor(duration / 60)).slice(-2)
+        let hours = Math.floor(duration / 3600)
+        a.innerHTML = hours + ':' + minutes + ':' + seconds
     }, 1000)
 }
 
@@ -151,13 +195,18 @@ function downloadRecording() {
     const blob = new Blob(recordedBlobs, { type: 'video/webm' });
     const url = window.URL.createObjectURL(blob);
     const a = document.createElement('a');
+    let name = document.getElementById('download-name').value
+    if (name === '') {
+        name = 'Video'
+    }
     a.style.display = 'none';
     a.href = url;
-    a.download = 'Video.webm';
+    a.download = name + '.webm';
     document.body.appendChild(a);
     a.click();
     setTimeout(() => {
         document.body.removeChild(a);
         window.URL.revokeObjectURL(url);
     }, 100);
+    console.log('Recording downloaded: ' + a.download)
 }

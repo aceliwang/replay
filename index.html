@@ -3,52 +3,127 @@
 <head>
     <title>Replay</title>
     <link rel='stylesheet' href='style.css' />
+    <link rel="stylesheet" href="https://fonts.googleapis.com/icon?family=Material+Icons">
     <script src='javascript.js' type='text/javascript' defer></script>
 </head>
 
 <body>
     <div id='controls_panel'>
+        <input id='settings' type='button' value='Settings' />
         <input id='setup' type='button' value='Setup' />
         <input id='record' type='button' value='Record' disabled />
         <input id='download' type='button' value='Download' disabled />
+        <input id='info' type='button' value='Info' />
         <hr />
     </div>
-    <div id='settings_panel'>
+    <div id='settings_panel' style='display:block;'>
         <h1>Settings</h1>
         <h2>Video</h2>
-        <label for='cursor'>Cursor</label>
-        <input id='cursor' type='button' value='Always' />
-        <hr />
+        <div>
+            <span>Cursor</span><br>
+            <input id='cursor-always' name='cursor' type='radio' value='always' checked />
+            <label for='cursor-always'>Always</label><br>
+            <input id='cursor-motion' name='cursor' type='radio' value='motion' />
+            <label for='cursor-motion'>Motion</label><br>
+            <input id='cursor-never' name='cursor' type='radio' value='never' />
+            <label for='cursor-never'>Never</label><br>
+        </div>
+        <div>
+            Custom Name
+            <input id='download-name' type='text' placeholder='Video' />
+        </div>
+        <div>
+            https://webdevtrick.com/javascript-price-range-slider/
+            <label for='aspect-ratio'>Aspect Ratio</label>
+            <input id='aspect-ratio' type='range' />
+        </div>
+        <!-- <div>
+            <label for='facing-mode'>Facing Mode</label>
+            <input id='facing-mode' type='radio'>Facing Mode</input>
+        </div> -->
+        <div>
+            <label for='frame-rate'>Frame Rate</label>
+            <input id='frame-rate' type='range'>Frame Rate</input>
+        </div>
+        <div>
+            <label for='recording-height'>Video Height</label>
+            <input id='recording-height' type='range'>Height</input>
+        </div>
+        <div>
+            <label for='recording-width'>Video Width</label>
+            <input id='recording-width' type='range'>Width</input>
+        </div>
+        <div>
+            <label for='resize-mode'>Resize Mode</label>
+            <input id='resize-mode' type='radio'>Resize Mode</input>
+        </div>
+        <div>
+            <label for='display-surface'>Display Surface</label>
+            <input id='display-surface' type='radio'>Display Surface</input>
+        </div>
+        <div>
+            <label for='logical-surface'>Logical Surface</label>
+            <input id='logical-surface' type='radio'>Logical Surface</input>
+        </div>
         <h2>Audio</h2>
-        <label for='echoCancellation'>Echo Cancellation</label>
-        <input id='echoCancellation' type='button' value='On' />
-        <label for='noiseSuppression'>Noise Suppression</label>
-        <input id='noiseSuppression' type='button' value='On' />
+        <div>
+            <label for='echo-cancellation'>Echo Cancellation</label>
+            <input id='echo-cancellation' type='button' value='On' />
+        </div>
+        <div>
+            <label for='noise-suppression'>Noise Suppression</label>
+            <input id='noise-suppression' type='button' value='On' />
+        </div>
+        <div>
+            Device ID
+            Group ID
+            AutoGainControl
+            ChannelCount
+            Latency
+            Sample Rate
+            Sample Size
+            Volume
+        </div>
+
+        <h2>Timing</h2>
+        <input></input>
     </div>
     <div id='preview_panel'>
         <h1>Preview</h1>
         <div id='video_resize'>
             <video id='preview'></video>
         </div>
-        <h2>Audio Meter</h2>
-        <div id='metre'></div>
+        <h2>Audio Meter
+            <input id='gain' type='range' min='0' max='10' step='0.1' />
+        </h2>
+        <div id='metre' style='width: 0px'></div>
     </div>
     <div id='log_panel'>
         <h1>Log</h1>
         <pre id='log'></pre>
     </div>
-    <div>
-        <h1>To Do</h1>
-        <ul>
-            <li>Add gain to audio metre</li>
-            <li>Format site</li>
-            <li>Format time</li>
-            <li>Add in settings</li>
-        </ul>
+    <div id='info_panel' style='display:none'>
+        <h1>Help</h1>
+        <li>Choose settings in Settings</li>
+        <li>Setup capture. Remember to share audio if needed</li>
+        <li>Start recording if preview is acceptable</li>
+        <li>Stop recording when capture is finished</li>
+        <li>Download file</li>
+        <h1>Notes</h1>
+        <li>If recording meetings, remember to have a stable internet connection.</li>
+        <li>Output speaker level does not interfere with audio record. Use audio metre to discern.</li>
+        <li>Audio capture within a tab will not have any external sources of audio.</li>
+        <li>Process post-download using ffmpeg for compression and wrapping.</li>
+        <code>ffmpeg -i 'Recording.webm' 'Recording.mp4'</code>
+        <h1>Upcoming features</h1>
+        <li>Choose camera and mic input</li>
+        <li>Format site</li>
+        <li>Format time</li>
+        <li>Add in settings, put it before grab media, add help</li>
+        <li>Delay recording, add scheduling</li>
+        <li>Time out recording</li>
+        <li>Recording, not recording status: BIG</li>
     </div>
-    <h1>Notes</h1>
-    <span>Output speaker level does not interfere with audio record. Use audio metre to discern.</span>
-    <span>Process post-download using ffmpeg for compression and wrapping.</span>
 
 </body>
 

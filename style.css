@@ -4,8 +4,13 @@
   
   input {
     display: inline-block;
+  }
+
+  input[type='button'] {
+    display: inline-block;
     margin: 5px;
   }
+
 
   video {
     width: 100%;
@@ -27,7 +32,6 @@
 
   #video_resize {
     resize: both;
-    /* background-color: black; */
     overflow: hidden;
     width: 25%;
   }
