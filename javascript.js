@@ -19,9 +19,10 @@ const audioGain = document.getElementById('gain')
 const echoCancellation = document.getElementById('echo-cancellation')
 const noiseSuppression = document.getElementById('noise-suppression')
 const autoGainControl = document.getElementById('autogain-control')
-const status = document.createElement('span');
+const status = document.getElementById('status');
+const status_duration = document.getElementById('duration');
 // log
-console.log = msg => logNode.innerHTML = `${msg}<br>` + logNode.innerHTML;
+console.log = msg => logNode.innerHTML = `# ${msg}<br>` + logNode.innerHTML;
 console.error = msg => logNode.innerHTML = `<br><span class='error'>${msg}</span><br>` + logNode.innerHTML;
 console.warn = msg => `<br><span class='warn'>${msg}<span><br>` + logNode.innerHTML;
 console.info = msg => logNode.innerHTML = `<br><span class='info'>${msg}</span><br>` + logNode.innerHTML;
@@ -50,7 +51,7 @@ infoButton.onclick = function () {
 
 setupButton.onclick = function () {
     let options = parseOptions();
-    startCapture(options);
+    startCapture(options, 'camera');
 }
 
 recordButton.onclick = function () {
@@ -105,11 +106,19 @@ settingsToggles.forEach(function (item) {
 
 // https://developer.mozilla.org/en-US/docs/Web/API/MediaStreamConstraints
 function parseOptions() {
+    function parseValue(input) {
+        if (input.value == 'On') {
+            return true
+        } else if (input.value == 'Off') {
+            return false
+        }
+    }
     var displayMediaOptions = {
         audio: {
             // echoCancellation: document.getElementById('echoCancellation').value(),
-            echoCancellation: true,
-            noiseSuppression: true,
+            echoCancellation: parseValue(echoCancellation),
+            noiseSuppression: parseValue(noiseSuppression),
+            autoGainControl: parseValue(autoGainControl),
             sampleRate: 44100,
         },
         video: {
@@ -154,7 +163,7 @@ function audioMetre() {
             , 50)
     } catch (error) {
         if (error.name === 'InvalidStateError') {
-            audioMetreTitle.innerHTML = 'No audio track selected. Click to close.'
+            audioMetreTitle.innerHTML = 'No audio track selected. Click to hide.'
             audioMetreTitle.onclick = () => audioMetreTitle.style.display = 'none'
             console.log('Nil audio recorded.')
         } else {
@@ -166,13 +175,17 @@ function audioMetre() {
 
 }
 
-async function startCapture(displayMediaOptions) {
+async function startCapture(displayMediaOptions, type) {
     let captureStream = null;
-    let previewVideo = document.getElementById('preview');
+    let previewVideo = videoNode;
     try {
-        captureStream = await navigator.mediaDevices.getDisplayMedia(
-            parseOptions()
-        );
+        if (type == 'screen') {
+            captureStream = await navigator.mediaDevices.getDisplayMedia(displayMediaOptions
+            );
+        } else if (type == 'camera') {
+            captureStream = await navigator.mediaDevices.getUserMedia(displayMediaOptions
+            );
+        }
         previewVideo.srcObject = captureStream;
         mediaStream = captureStream;
         captureStream.oninactive = () => {
@@ -189,14 +202,18 @@ async function startCapture(displayMediaOptions) {
         }
         logInfo();
         previewPanel.style.display = 'block';
-        console.log('Capture setup.')
+        console.log('Screen capture set up.')
         recordButton.disabled = false;
-        status.innerHTML = 'Not recording.'
-        controlPanel.insertBefore(status, document.querySelector('#controls_panel hr'));
+        status.value = 'Not recording.'
     } catch (error) {
-        console.error('Error:' + error);
+        if (error.name === 'NotAllowedError') {
+            console.log('Capture permission denied.')
+        } else {
+            console.error('Error: ' + error);
+        }
     }
 }
+
 
 function handleDataAvailable(event) {
     if (event.data && event.data.size > 0) {
@@ -212,12 +229,15 @@ function startRecording() {
     mediaRecorder.start();
     console.log('Recording started.');
     let startTime = Date.now()
+    status.value = 'Recording'
+    status.disabled = false
+    status_duration.style.display = 'inline-block'
     timer = setInterval(function () {
         let duration = Math.round((Date.now() - startTime) / 1000)
         let seconds = ('0' + duration % 60).slice(-2)
         let minutes = ('0' + Math.floor(duration / 60)).slice(-2)
         let hours = Math.floor(duration / 3600)
-        status.innerHTML = 'Recording duration: ' + hours + ':' + minutes + ':' + seconds
+        status_duration.value = hours + ':' + minutes + ':' + seconds
     }, 1000)
 }
 
@@ -226,6 +246,8 @@ function stopRecording() {
     console.log('Recording stopped.');
     clearInterval(timer);
     status.innerHTML = 'Recording stopped. ' + status.innerHTML
+    status.value = 'Not recording'
+    status.disabled = true
 }
 
 function downloadRecording() {
@@ -246,4 +268,11 @@ function downloadRecording() {
         window.URL.revokeObjectURL(url);
     }, 100);
     console.log('Recording downloaded: ' + a.download)
+}
+
+function createLogo() {
+    var canvas = document.createElement('svg');
+    let canvasHeight = 50
+    var radius = 200
+    canvas.appendChild()
 }

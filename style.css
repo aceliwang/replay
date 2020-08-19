@@ -17,7 +17,7 @@ h1 {
   #content {
     overflow: auto;
     height: 100%;
-    padding: 2vh 0vh;
+    padding-bottom: 2vh;
   }
   
   input {
@@ -70,12 +70,6 @@ h1 {
   video {
     width: 100%;
   }
-
-  #log_panel {
-    /* display: flex; */
-    /* justify-content: flex-start; */
-    /* overflow: scroll; */
-  }
   
   /* console logs */
   
@@ -101,10 +95,18 @@ h1 {
     display: none;
   }
 
+  #status_panel {
+    display: inline-block;
+  }
+
+  #duration {
+    display: none;
+  }
+
   #controls_panel {
     /* position: fixed; */
     /* top: 0px; */
-    flex: 1;
+    /* flex: 1; */
     background-color: white;
     width: 100%;
   }
