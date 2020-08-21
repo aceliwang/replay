@@ -18,19 +18,23 @@ h1 {
     overflow: auto;
     height: 100%;
     padding-bottom: 2vh;
+    position: relative;
   }
   
   input {
     display: inline-block;
   }
 
-  input[type='button'] {
+  input[type='button'],
+  button {
     display: inline-block;
     margin: 5px;
     background-color: #ffffff;
-    padding: 6px 20px;
+    padding: 6px;
     font-size: 1em;
     font-weight: bolder;
+    min-height: 40px;
+    vertical-align: middle;
   }
 
   label {
@@ -133,4 +137,29 @@ h1 {
   #metre {
     height: 5px;
     background-color: black;
+  }
+
+  svg {
+    /* aspect-ratio: 1 /1; */
+    height: 40vh;
+    width: 40vh;
+    /* display: block; */
+    position: absolute;
+    /* margin: auto; */
+    top: calc(50% - 20vh);
+    left: calc(50% - 20vh);
+    animation-duration: 10s;
+    animation-name: slidein;
+    animation-iteration-count: infinite;
+    animation-timing-function: linear;
+    /* animation-direction: alternate; */
+  }
+
+  @keyframes slidein {
+    from {
+      transform: rotate(0deg);
+    }
+    to {
+      transform: rotate(360deg);
+    }
   }

@@ -10,11 +10,16 @@
 <body>
     <header>
         <div id='controls_panel'>
-            <input id='settings' type='button' value='Settings' />
-            <input id='setup' type='button' value='Setup' />
-            <input id='record' type='button' value='Record' disabled />
-            <input id='download' type='button' value='Download' disabled />
-            <input id='info' type='button' value='Info' />
+            <button id='settings' title='Settings'><i class='material-icons'>settings</i></button>
+            <!-- <input id='settings' type='button' value='Settings' /> -->
+            <button id='setup-screen' title='Setup screen capture'><i class='material-icons'>desktop_windows</i></button>
+            <!-- <input id='setup' type='button' value='Setup' /> -->
+            <button id='setup-camera' title='Setup camera capture'><i class='material-icons'>camera_alt</i></button>
+            <!-- <input id='record' type='button' value='Record' disabled /> -->
+            <button id='record' title='Record' disabled><i class='material-icons'>stop_circle</i></button>
+            <button id='download' title='Download' disabled><i class='material-icons'>get_app</i></button>
+            <!-- <input id='download' type='button' value='Download' disabled /> -->
+            <button id='info' title='Info'><i class='material-icons'>help</i></button>
             <div id='status_panel'>
                 <span style='font-size:x-large'>|</span>
                 <input id='status' type='button' value='Not recording' disabled/>
@@ -132,7 +137,7 @@
             <li>Post-editing, post-preview</li>
             <li>Copy log</li>
         </div>
-        <svg height='500px' width='500px'>
+        <svg id='logo'>
             <line x1='15.36%' y1='30%' x2='15.36%' y2='70%' stroke-width='5' stroke='black' />
             <line x1='15.36%' y1='70%' x2='15.36%' y2='90%' stroke-width='5' stroke='black' />
             <line x1='15.36%' y1='30%' x2='50%' y2='50%' stroke-width='5' stroke='black' />
@@ -150,7 +155,6 @@
             <circle cx='50%' cy='90%' r='10' fill='black' />
             <circle cx='84.64%' cy='30%' r='10' fill='black' />
             <circle cx='84.64%' cy='70%' r='10' fill='black' />
-
         </svg>
     </div>
     <footer>

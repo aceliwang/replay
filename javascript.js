@@ -1,5 +1,6 @@
 // buttons
-const setupButton = document.getElementById('setup');
+const screenSetupButton = document.getElementById('setup-screen');
+const cameraSetupButton = document.getElementById('setup-camera');
 const recordButton = document.getElementById('record');
 const downloadButton = document.getElementById('download');
 const settingsButton = document.getElementById('settings');
@@ -21,6 +22,7 @@ const noiseSuppression = document.getElementById('noise-suppression')
 const autoGainControl = document.getElementById('autogain-control')
 const status = document.getElementById('status');
 const status_duration = document.getElementById('duration');
+const logo = document.getElementById('logo')
 // log
 console.log = msg => logNode.innerHTML = `# ${msg}<br>` + logNode.innerHTML;
 console.error = msg => logNode.innerHTML = `<br><span class='error'>${msg}</span><br>` + logNode.innerHTML;
@@ -36,8 +38,10 @@ var audioMetreTitleOriginal = audioMetreTitle.innerHTML
 settingsButton.onclick = function () {
     if (settingsPanel.style.display === 'none') {
         settingsPanel.style.display = 'block'
+        logo.style.display = 'none'
     } else if (settingsPanel.style.display === 'block') {
         settingsPanel.style.display = 'none'
+        logo.style.display = 'block'
     }
 }
 
@@ -49,24 +53,31 @@ infoButton.onclick = function () {
     }
 }
 
-setupButton.onclick = function () {
+cameraSetupButton.onclick = function () {
     let options = parseOptions();
     startCapture(options, 'camera');
 }
 
+screenSetupButton.onclick = function () {
+    let options = parseOptions();
+    startCapture(options, 'screen');
+}
+
 recordButton.onclick = function () {
-    switch (recordButton.value) {
-        case 'Record':
+    switch (recordButton.firstElementChild.innerText) {
+        case 'stop_circle':
             startRecording();
-            recordButton.value = 'Stop';
+            recordButton.firstElementChild.innerText = 'stop';
             downloadButton.disabled = true;
             settingsButton.disabled = true;
-            setupButton.disabled = true;
+            cameraSetupButton.disabled = true;
+            screenSetupButton.disabled = true;
             break;
-        case 'Stop':
+        case 'stop':
             stopRecording();
-            recordButton.value = 'Record';
-            setupButton.disabled = false;
+            recordButton.firstElementChild.innerText = 'stop_circle';
+            cameraSetupButton.disabled = false;
+            screenSetupButton.disabled = false;
             downloadButton.disabled = false;
             settingsButton.disabled = false;
         default:
@@ -204,7 +215,7 @@ async function startCapture(displayMediaOptions, type) {
         previewPanel.style.display = 'block';
         console.log('Screen capture set up.')
         recordButton.disabled = false;
-        status.value = 'Not recording.'
+        status.value = 'Not recording'
     } catch (error) {
         if (error.name === 'NotAllowedError') {
             console.log('Capture permission denied.')
