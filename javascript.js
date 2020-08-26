@@ -33,7 +33,7 @@ const clearStart = document.getElementById('clear-recording-start')
 const clearStop = document.getElementById('clear-recording-stop')
 const logo = document.getElementById('logo')
 // log
-console.log = msg => logNode.innerHTML = `# ${msg}<br>` + logNode.innerHTML;
+console.log = msg => {logNode.innerHTML = logNode.innerHTML + `<br># ${msg}`; logNode.scrollTop = logNode.scrollHeight;};
 console.error = msg => logNode.innerHTML = `<br><span class='error'>${msg}</span><br>` + logNode.innerHTML;
 console.warn = msg => `<br><span class='warn'>${msg}<span><br>` + logNode.innerHTML;
 console.info = msg => logNode.innerHTML = `<br><span class='info'>${msg}</span><br>` + logNode.innerHTML;
@@ -58,7 +58,6 @@ setInterval(
         now = new Date(Date.now())
         clockTime.innerText = now.toLocaleTimeString()
         clockDate.innerText = now.toLocaleDateString()
-        console.log(now.getUTCSeconds() == recordStartTime.getUTCSeconds())
         if (mediaStream !== undefined && now.getUTCSeconds() == recordStartTime.getUTCSeconds() && !schedulerTriggered) {
             recordButton.click()
             schedulerTriggered = true;
