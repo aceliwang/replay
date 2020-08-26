@@ -112,6 +112,10 @@ h1 {
     /* top: 0px; */
     /* flex: 1; */
     background-color: white;
+    width: auto;
+  }
+
+  #clock {
     width: 100%;
   }
 
@@ -134,12 +138,18 @@ h1 {
     font-size: 20px;
   }
 
+  #log_controls {
+    display: flex;
+    flex-flow: column;
+    margin-right: 8px;
+  }
+
   #metre {
     height: 5px;
     background-color: black;
   }
 
-  svg {
+  svg#logo {
     /* aspect-ratio: 1 /1; */
     height: 40vh;
     width: 40vh;

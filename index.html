@@ -9,24 +9,54 @@
 
 <body>
     <header>
-        <div id='controls_panel'>
-            <button id='settings' title='Settings'><i class='material-icons'>settings</i></button>
-            <!-- <input id='settings' type='button' value='Settings' /> -->
-            <button id='setup-screen' title='Setup screen capture'><i class='material-icons'>desktop_windows</i></button>
-            <!-- <input id='setup' type='button' value='Setup' /> -->
-            <button id='setup-camera' title='Setup camera capture'><i class='material-icons'>camera_alt</i></button>
-            <!-- <input id='record' type='button' value='Record' disabled /> -->
-            <button id='record' title='Record' disabled><i class='material-icons'>stop_circle</i></button>
-            <button id='download' title='Download' disabled><i class='material-icons'>get_app</i></button>
-            <!-- <input id='download' type='button' value='Download' disabled /> -->
-            <button id='info' title='Info'><i class='material-icons'>help</i></button>
-            <div id='status_panel'>
-                <span style='font-size:x-large'>|</span>
-                <input id='status' type='button' value='Not recording' disabled/>
-                <input id='duration' type='button' value='0:00:00' />
+        <div style='display:flex; justify-content:space-between; align-content:center'>
+            <div id='controls_panel'>
+                <button id='settings' title='Settings'><i class='material-icons'>settings</i></button>
+                <!-- <input id='settings' type='button' value='Settings' /> -->
+                <button id='setup-screen' title='Setup screen capture'><i
+                        class='material-icons'>desktop_windows</i></button>
+                <!-- <input id='setup' type='button' value='Setup' /> -->
+                <button id='setup-camera' title='Setup camera capture'><i class='material-icons'>camera_alt</i></button>
+                <!-- <input id='record' type='button' value='Record' disabled /> -->
+                <button id='record' title='Record' disabled><i class='material-icons'>stop_circle</i></button>
+                <button id='download' title='Download' disabled><i class='material-icons'>get_app</i></button>
+                <!-- <input id='download' type='button' value='Download' disabled /> -->
+                <button id='info' title='Info'><i class='material-icons'>help</i></button>
+                <div id='status_panel'>
+                    <span style='font-size:x-large'>|</span>
+                    <input id='status' type='button' value='Not recording' disabled />
+                    <input id='duration' type='button' value='0:00:00' />
+                </div>
             </div>
-            <hr />
+            <div>
+                <div style='vertical-align:middle;display:inline-block'>
+                    <button id='clock-date'></button>
+                    <button id='clock-time'></button>
+                </div>
+                <div style='display:inline-block;vertical-align: middle;'>
+                    <svg style='height:5vh;width:5vh;display:inline-block'>
+                        <line x1='15.36%' y1='30%' x2='15.36%' y2='70%' stroke-width='5%' stroke='black' />
+                        <line x1='15.36%' y1='70%' x2='15.36%' y2='90%' stroke-width='5%' stroke='black' />
+                        <line x1='15.36%' y1='30%' x2='50%' y2='50%' stroke-width='5%' stroke='black' />
+                        <line x1='15.36%' y1='70%' x2='50%' y2='50%' stroke-width='5%' stroke='black' />
+                        <line x1='15.36%' y1='70%' x2='50%' y2='90%' stroke-width='5%' stroke='black' />
+                        <line x1='50%' y1='10%' x2='50%' y2='50%' stroke-width='5%' stroke='red' />
+                        <line x1='50%' y1='50%' x2='50%' y2='90%' stroke-width='5%' stroke='red' />
+                        <line x1='50%' y1='10%' x2='84.64%' y2='30%' stroke-width='5%' stroke='red' />
+                        <line x1='50%' y1='50%' x2='84.64%' y2='30%' stroke-width='5%' stroke='red' />
+                        <circle cx='15.36%' cy='30%' r='5%' fill='black' />
+                        <circle cx='15.36%' cy='70%' r='5%' fill='black' />
+                        <circle cx='15.36%' cy='90%' r='5%' fill='black' />
+                        <circle cx='50%' cy='10%' r='5%' fill='black' />
+                        <circle cx='50%' cy='50%' r='5%' fill='black' />
+                        <circle cx='50%' cy='90%' r='5%' fill='black' />
+                        <circle cx='84.64%' cy='30%' r='5%' fill='black' />
+                        <circle cx='84.64%' cy='70%' r='5%' fill='black' />
+                    </svg>
+                </div>
+            </div>
         </div>
+        <hr />
     </header>
     <div id='content'>
         <div id='settings_panel' style='display:none;'>
@@ -70,6 +100,10 @@
                         <label for='recording-width'>Video Width</label>
                         <input id='recording-width' type='range'>Width</input>
                     </div>
+                    <div>
+                        <label for='maximum-duration'>Duration (seconds)</label>
+                        <input id='maximum-duration' type='number'>
+                    </div>
                     <!-- <div>
                     <label for='resize-mode'>Resize Mode</label>
                     <input id='resize-mode' type='radio'>Resize Mode</input>
@@ -105,7 +139,9 @@
                 </div>
 
                 <h2>Timing</h2>
-                <input></input>
+
+                <input id='recording-start' type='datetime-local'>
+                <input id='recording-stop' type='datetime-local'>
             </div>
         </div>
         <div id='preview_panel'>
@@ -132,35 +168,37 @@
             <code>ffmpeg -i 'Recording.webm' 'Recording.mp4'</code>
             <h1>Upcoming features</h1>
             <li>Choose camera and mic input</li>
-            <li>Delay recording, add scheduling</li>
-            <li>Time out recording</li>
-            <li>Post-editing, post-preview</li>
-            <li>Copy log</li>
+            <li>Add scheduling</li>
+            <li>Post-editing</li>
         </div>
         <svg id='logo'>
-            <line x1='15.36%' y1='30%' x2='15.36%' y2='70%' stroke-width='5' stroke='black' />
-            <line x1='15.36%' y1='70%' x2='15.36%' y2='90%' stroke-width='5' stroke='black' />
-            <line x1='15.36%' y1='30%' x2='50%' y2='50%' stroke-width='5' stroke='black' />
-            <line x1='15.36%' y1='70%' x2='50%' y2='50%' stroke-width='5' stroke='black' />
-            <line x1='15.36%' y1='70%' x2='50%' y2='90%' stroke-width='5' stroke='black' />
-            <line x1='50%' y1='10%' x2='50%' y2='50%' stroke-width='5' stroke='red' />
-            <line x1='50%' y1='50%' x2='50%' y2='90%' stroke-width='5' stroke='red' />
-            <line x1='50%' y1='10%' x2='84.64%' y2='30%' stroke-width='5' stroke='red' />
-            <line x1='50%' y1='50%' x2='84.64%' y2='30%' stroke-width='5' stroke='red' />
-            <circle cx='15.36%' cy='30%' r='10' fill='black' />
-            <circle cx='15.36%' cy='70%' r='10' fill='black' />
-            <circle cx='15.36%' cy='90%' r='10' fill='black' />
-            <circle cx='50%' cy='10%' r='10' fill='black' />
-            <circle cx='50%' cy='50%' r='10' fill='black' />
-            <circle cx='50%' cy='90%' r='10' fill='black' />
-            <circle cx='84.64%' cy='30%' r='10' fill='black' />
-            <circle cx='84.64%' cy='70%' r='10' fill='black' />
+            <line x1='15.36%' y1='30%' x2='15.36%' y2='70%' stroke-width='1.5%' stroke='black' />
+            <line x1='15.36%' y1='70%' x2='15.36%' y2='90%' stroke-width='1.5%' stroke='black' />
+            <line x1='15.36%' y1='30%' x2='50%' y2='50%' stroke-width='1.5%' stroke='black' />
+            <line x1='15.36%' y1='70%' x2='50%' y2='50%' stroke-width='1.5%' stroke='black' />
+            <line x1='15.36%' y1='70%' x2='50%' y2='90%' stroke-width='1.5%' stroke='black' />
+            <line x1='50%' y1='10%' x2='50%' y2='50%' stroke-width='1.5%' stroke='red' />
+            <line x1='50%' y1='50%' x2='50%' y2='90%' stroke-width='1.5%' stroke='red' />
+            <line x1='50%' y1='10%' x2='84.64%' y2='30%' stroke-width='1.5%' stroke='red' />
+            <line x1='50%' y1='50%' x2='84.64%' y2='30%' stroke-width='1.5%' stroke='red' />
+            <circle cx='15.36%' cy='30%' r='3%' fill='black' />
+            <circle cx='15.36%' cy='70%' r='3%' fill='black' />
+            <circle cx='15.36%' cy='90%' r='3%' fill='black' />
+            <circle cx='50%' cy='10%' r='3%' fill='black' />
+            <circle cx='50%' cy='50%' r='3%' fill='black' />
+            <circle cx='50%' cy='90%' r='3%' fill='black' />
+            <circle cx='84.64%' cy='30%' r='3%' fill='black' />
+            <circle cx='84.64%' cy='70%' r='3%' fill='black' />
         </svg>
     </div>
     <footer>
         <hr>
         <div id='log_panel' style='display:flex;'>
             <!-- <h1 style='margin-right:30px;display:inline-block;'>Log</h1> -->
+            <div id='log_controls'>
+                <button id='copy_log' title='Copy log'><i class='material-icons'>content_copy</i></button>
+                <button id='clear_log' title='Clear log'><i class='material-icons'>backspace</i></button>
+            </div>
             <div id='log'>
                 # Log
             </div>

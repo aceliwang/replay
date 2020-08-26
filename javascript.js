@@ -5,12 +5,16 @@ const recordButton = document.getElementById('record');
 const downloadButton = document.getElementById('download');
 const settingsButton = document.getElementById('settings');
 const infoButton = document.getElementById('info');
+const logCopy = document.getElementById('copy_log');
+const logClear = document.getElementById('clear_log');
 // divs
 const videoDiv = document.getElementById('video_resize')
 const previewPanel = document.getElementById('preview_panel')
 const controlPanel = document.getElementById('controls_panel')
 const settingsPanel = document.getElementById('settings_panel')
 const infoPanel = document.getElementById('info_panel')
+const clockDate = document.getElementById('clock-date')
+const clockTime = document.getElementById('clock-time')
 // components + forms
 const logNode = document.getElementById('log');
 const videoNode = document.getElementById('preview');
@@ -22,6 +26,7 @@ const noiseSuppression = document.getElementById('noise-suppression')
 const autoGainControl = document.getElementById('autogain-control')
 const status = document.getElementById('status');
 const status_duration = document.getElementById('duration');
+const maximumDuration = document.getElementById('maximum-duration')
 const logo = document.getElementById('logo')
 // log
 console.log = msg => logNode.innerHTML = `# ${msg}<br>` + logNode.innerHTML;
@@ -34,6 +39,19 @@ var recordedBlobs;
 var mediaStream;
 var timer;
 var audioMetreTitleOriginal = audioMetreTitle.innerHTML
+var recordingBlob;
+var url;
+
+// init
+let now = new Date(Date.now())
+clockDate.innerText = now.toLocaleDateString()
+clockTime.innerText = now.toLocaleTimeString()
+setInterval(
+    function () {
+        now = new Date(Date.now())
+        clockTime.innerText = now.toLocaleTimeString()
+        clockDate.innerText = now.toLocaleDateString()
+    }, 1000)
 
 settingsButton.onclick = function () {
     if (settingsPanel.style.display === 'none') {
@@ -101,6 +119,14 @@ videoDiv.onmouseup = function () {
     }
 }
 
+logCopy.onclick = function () {
+    navigator.clipboard.writeText(logNode.innerText)
+}
+
+logClear.onclick = function () {
+    logNode.innerHTML = '# Log'
+}
+
 // settings
 const settingsToggles = [echoCancellation, noiseSuppression, autoGainControl]
 settingsToggles.forEach(function (item) {
@@ -110,6 +136,7 @@ settingsToggles.forEach(function (item) {
         } else {
             item.value = 'On'
         }
+        console.log(item.id + ' turned ' + item.value)
     }
 }
 )
@@ -213,7 +240,10 @@ async function startCapture(displayMediaOptions, type) {
         }
         logInfo();
         previewPanel.style.display = 'block';
-        console.log('Screen capture set up.')
+        console.log(type + ' capture set up.')
+        if (type == 'camera') {
+
+        }
         recordButton.disabled = false;
         status.value = 'Not recording'
     } catch (error) {
@@ -231,6 +261,11 @@ function handleDataAvailable(event) {
         recordedBlobs.push(event.data);
     }
     console.log('Download available.')
+    recordingBlob = new Blob(recordedBlobs, { type: 'video/webm' });
+    url = window.URL.createObjectURL(recordingBlob);
+    videoNode.src = url
+    videoNode.srcObject = null
+    videoNode.controls = true
 }
 
 function startRecording() {
@@ -244,7 +279,10 @@ function startRecording() {
     status.disabled = false
     status_duration.style.display = 'inline-block'
     timer = setInterval(function () {
-        let duration = Math.round((Date.now() - startTime) / 1000)
+        let duration = Math.floor((Date.now() - startTime) / 1000)
+        if (maximumDuration.value != '' && duration >= Number(maximumDuration.value)) {
+            recordButton.click()
+        }
         let seconds = ('0' + duration % 60).slice(-2)
         let minutes = ('0' + Math.floor(duration / 60)).slice(-2)
         let hours = Math.floor(duration / 3600)
@@ -262,8 +300,7 @@ function stopRecording() {
 }
 
 function downloadRecording() {
-    const blob = new Blob(recordedBlobs, { type: 'video/webm' });
-    const url = window.URL.createObjectURL(blob);
+
     const a = document.createElement('a');
     let name = document.getElementById('download-name').value
     if (name === '') {
