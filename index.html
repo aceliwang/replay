@@ -102,7 +102,7 @@
                     </div>
                     <div>
                         <label for='maximum-duration'>Duration (seconds)</label>
-                        <input id='maximum-duration' type='number'>
+                        <input id='maximum-duration' type='number' min='0' title='Cannot be used with settings: Recording Stop'>
                     </div>
                     <!-- <div>
                     <label for='resize-mode'>Resize Mode</label>
@@ -136,14 +136,19 @@
                         Sample Size
                         Volume
                     </div>
+                    <h2>Scheduling</h2>
+                    <div>
+                        <label for='recording-start'>Recording Start</label>
+                        <input id='recording-start' type='datetime-local'>
+                        <button id='clear-recording-start'>Clear</button>
+                    </div>
+                    <div>
+                        <label for='recording-stop'>Recording Stop</label>
+                        <input id='recording-stop' type='datetime-local'>
+                        <button id='clear-recording-stop'>Clear</button>
+                    </div>
                 </div>
 
-                <h2>Scheduling</h2>
-                <input id='recording-start' type='datetime-local'>
-                <button id='clear-recording-start'>Clear</button>
-                <br>
-                <input id='recording-stop' type='datetime-local'>
-                <button id='clear-recording-stop'>Clear</button>
             </div>
         </div>
         <div id='preview_panel'>
@@ -171,6 +176,7 @@
             <h1>Upcoming features</h1>
             <li>Choose camera and mic input</li>
             <li>Post-editing</li>
+            <li>Add a closing notification</li> 
         </div>
         <svg id='logo'>
             <line x1='15.36%' y1='30%' x2='15.36%' y2='70%' stroke-width='1.5%' stroke='black' />

@@ -68,6 +68,8 @@ setInterval(
         }
     }, 1000)
 
+window.addEventListener('beforeunload', alert("HI"))
+
 recordStart.onchange = function() {
     recordStartTime = new Date(recordStart.value)
     status.value = 'Scheduled'
@@ -76,6 +78,7 @@ recordStart.onchange = function() {
 
 recordStop.onchange = function() {
     recordStopTime = new Date(recordStop.value)
+    maximumDuration.disabled = true;
 }
 
 clearStart.onclick = function() {
@@ -88,6 +91,7 @@ clearStart.onclick = function() {
 
 clearStop.onclick = function() {
     recordStop.value = ''
+    maximumDuration.disabled = false;
 }
 
 
@@ -319,7 +323,7 @@ function startRecording() {
     status_duration.style.display = 'inline-block'
     timer = setInterval(function () {
         let duration = Math.floor((Date.now() - startTime) / 1000)
-        if (maximumDuration.value != '' && duration >= Number(maximumDuration.value)) {
+        if (!schedulerTriggered && maximumDuration.value != '' && duration >= Number(maximumDuration.value)) {
             recordButton.click()
         }
         let seconds = ('0' + duration % 60).slice(-2)
