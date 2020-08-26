@@ -27,6 +27,10 @@ const autoGainControl = document.getElementById('autogain-control')
 const status = document.getElementById('status');
 const status_duration = document.getElementById('duration');
 const maximumDuration = document.getElementById('maximum-duration')
+const recordStart = document.getElementById('recording-start')
+const recordStop = document.getElementById('recording-stop')
+const clearStart = document.getElementById('clear-recording-start')
+const clearStop = document.getElementById('clear-recording-stop')
 const logo = document.getElementById('logo')
 // log
 console.log = msg => logNode.innerHTML = `# ${msg}<br>` + logNode.innerHTML;
@@ -41,6 +45,9 @@ var timer;
 var audioMetreTitleOriginal = audioMetreTitle.innerHTML
 var recordingBlob;
 var url;
+var recordStartTime = new Date();
+var recordStopTime = new Date();
+var schedulerTriggered = false; 
 
 // init
 let now = new Date(Date.now())
@@ -51,7 +58,39 @@ setInterval(
         now = new Date(Date.now())
         clockTime.innerText = now.toLocaleTimeString()
         clockDate.innerText = now.toLocaleDateString()
+        console.log(now.getUTCSeconds() == recordStartTime.getUTCSeconds())
+        if (mediaStream !== undefined && now.getUTCSeconds() == recordStartTime.getUTCSeconds() && !schedulerTriggered) {
+            recordButton.click()
+            schedulerTriggered = true;
+        }
+        if (mediaStream !== undefined && now.getUTCSeconds() == recordStopTime.getUTCSeconds() && schedulerTriggered) {
+            recordButton.click()
+            schedulerTriggered = false;
+        }
     }, 1000)
+
+recordStart.onchange = function() {
+    recordStartTime = new Date(recordStart.value)
+    status.value = 'Scheduled'
+    console.log('Recording scheduled at ' + recordStartTime.toLocaleString())
+}
+
+recordStop.onchange = function() {
+    recordStopTime = new Date(recordStop.value)
+}
+
+clearStart.onclick = function() {
+    status.value = 'Not recording'
+    if (recordStart.value !== '') {
+        console.log('Scheduled recording cancelled')
+    }
+    recordStart.value = ''
+}
+
+clearStop.onclick = function() {
+    recordStop.value = ''
+}
+
 
 settingsButton.onclick = function () {
     if (settingsPanel.style.display === 'none') {
@@ -98,6 +137,7 @@ recordButton.onclick = function () {
             screenSetupButton.disabled = false;
             downloadButton.disabled = false;
             settingsButton.disabled = false;
+            status.value = 'Recording stopped'
         default:
             break;
     }
