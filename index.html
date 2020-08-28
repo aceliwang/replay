@@ -12,20 +12,18 @@
         <div style='display:flex; justify-content:space-between; align-content:center'>
             <div id='controls_panel'>
                 <button id='settings' title='Settings'><i class='material-icons'>settings</i></button>
-                <!-- <input id='settings' type='button' value='Settings' /> -->
                 <button id='setup-screen' title='Setup screen capture'><i
                         class='material-icons'>desktop_windows</i></button>
-                <!-- <input id='setup' type='button' value='Setup' /> -->
                 <button id='setup-camera' title='Setup camera capture'><i class='material-icons'>camera_alt</i></button>
-                <!-- <input id='record' type='button' value='Record' disabled /> -->
                 <button id='record' title='Record' disabled><i class='material-icons'>stop_circle</i></button>
                 <button id='download' title='Download' disabled><i class='material-icons'>get_app</i></button>
-                <!-- <input id='download' type='button' value='Download' disabled /> -->
                 <button id='info' title='Info'><i class='material-icons'>help</i></button>
                 <div id='status_panel'>
                     <span style='font-size:x-large'>|</span>
                     <input id='status' type='button' value='Not recording' disabled />
                     <input id='duration' type='button' value='0:00:00' />
+                    <!-- <input id='remaining' type='button' value='' /> -->
+                    <button id='remaining'><i class='material-icons'>event_busy</i><span></span></button>
                 </div>
             </div>
             <div>
@@ -59,21 +57,26 @@
         <hr />
     </header>
     <div id='content'>
-        <div id='settings_panel' style='display:none;'>
+        <div id='settings_panel' style='display:none'>
             <h1>Settings</h1>
             <div>
                 <div class='settings_column'>
                     <h2>Video</h2>
                     <div>
                         <span>Cursor</span>
-                        <div class='option_blocks'>
+                        <!-- <div class='option_blocks'>
                             <input id='cursor-always' name='cursor' type='radio' value='always' checked />
                             <label for='cursor-always'>Always: cursor is always visible</label><br>
                             <input id='cursor-motion' name='cursor' type='radio' value='motion' />
                             <label for='cursor-motion'>Motion: cursor is only visible if moving</label><br>
                             <input id='cursor-never' name='cursor' type='radio' value='never' />
                             <label for='cursor-never'>Never: cursor is never visible</label><br>
-                        </div>
+                        </div> -->
+                        <select id='cursor'>
+                            <option value='always'>Always</option>
+                            <option value='motion'>When moving</option>
+                            <option value='never'>Never</option>
+                        </select>
                     </div>
                     <div>
                         <label for='download-name'>Custom Name</label>
@@ -101,8 +104,10 @@
                         <input id='recording-width' type='range'>Width</input>
                     </div>
                     <div>
-                        <label for='maximum-duration'>Duration (seconds)</label>
-                        <input id='maximum-duration' type='number' min='0' title='Cannot be used with settings: Recording Stop'>
+                        <label for='maximum-duration'>Duration (sec)</label>
+                        <input id='maximum-duration' type='number' min='1'
+                            title='Cannot be used with settings: Recording Stop'>
+                        <button id='clear-maximum-duration'>Clear</button>
                     </div>
                     <!-- <div>
                     <label for='resize-mode'>Resize Mode</label>
@@ -144,7 +149,11 @@
                     </div>
                     <div>
                         <label for='recording-stop'>Recording Stop</label>
-                        <input id='recording-stop' type='datetime-local'>
+                        <input id='recording-stop' type='datetime-local' onclick='
+                        let max = new Date();
+                        let s = (time) => {return ("0" + time).slice(-2)}; 
+                        this.min = max.getFullYear() + "-" + s(max.getMonth() + 1) + "-" + s(max.getDate()) + "T" + s(max.getHours()) + ":" + s(max.getMinutes()) + ":" + s(max.getSeconds())
+                    '>
                         <button id='clear-recording-stop'>Clear</button>
                     </div>
                 </div>
@@ -176,7 +185,12 @@
             <h1>Upcoming features</h1>
             <li>Choose camera and mic input</li>
             <li>Post-editing</li>
-            <li>Add a closing notification</li> 
+            <li>Add a closing notification</li>
+            <li>Video Settings</li>
+            <li>Fix audio metre for switch from camera to screen input</li>
+            <li>Audio graph over time</li>
+            <li>Keyboard shortcuts</li>
+            <li>Add aniamtions: https://css-tricks.com/controlling-css-animations-transitions-javascript/</li>
         </div>
         <svg id='logo'>
             <line x1='15.36%' y1='30%' x2='15.36%' y2='70%' stroke-width='1.5%' stroke='black' />
@@ -201,17 +215,15 @@
     <footer>
         <hr>
         <div id='log_panel' style='display:flex;'>
-            <!-- <h1 style='margin-right:30px;display:inline-block;'>Log</h1> -->
             <div id='log_controls'>
                 <button id='copy_log' title='Copy log'><i class='material-icons'>content_copy</i></button>
                 <button id='clear_log' title='Clear log'><i class='material-icons'>backspace</i></button>
             </div>
             <div id='log'>
-                # Log
+                # Log<br>
             </div>
         </div>
     </footer>
-    <!-- <div id='trigger' style='height:20px;background-color:red'></div> -->
 
 </body>
 

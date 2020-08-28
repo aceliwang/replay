@@ -25,15 +25,17 @@ const echoCancellation = document.getElementById('echo-cancellation')
 const noiseSuppression = document.getElementById('noise-suppression')
 const autoGainControl = document.getElementById('autogain-control')
 const status = document.getElementById('status');
-const status_duration = document.getElementById('duration');
+const statusDuration = document.getElementById('duration');
+const remainingDuration = document.getElementById('remaining');
 const maximumDuration = document.getElementById('maximum-duration')
 const recordStart = document.getElementById('recording-start')
 const recordStop = document.getElementById('recording-stop')
 const clearStart = document.getElementById('clear-recording-start')
 const clearStop = document.getElementById('clear-recording-stop')
+const clearMaximumDuration = document.getElementById('clear-maximum-duration')
 const logo = document.getElementById('logo')
 // log
-console.log = msg => {logNode.innerHTML = logNode.innerHTML + `<br># ${msg}`; logNode.scrollTop = logNode.scrollHeight;};
+console.log = msg => { logNode.innerHTML = logNode.innerHTML + `<br># ${msg}`; logNode.scrollTop = logNode.scrollHeight; };
 console.error = msg => logNode.innerHTML = `<br><span class='error'>${msg}</span><br>` + logNode.innerHTML;
 console.warn = msg => `<br><span class='warn'>${msg}<span><br>` + logNode.innerHTML;
 console.info = msg => logNode.innerHTML = `<br><span class='info'>${msg}</span><br>` + logNode.innerHTML;
@@ -45,9 +47,9 @@ var timer;
 var audioMetreTitleOriginal = audioMetreTitle.innerHTML
 var recordingBlob;
 var url;
-var recordStartTime = new Date();
-var recordStopTime = new Date();
-var schedulerTriggered = false; 
+var recordStartTime = new Date(0);
+var recordStopTime = new Date(0);
+var schedulerTriggered = false;
 
 // init
 let now = new Date(Date.now())
@@ -58,30 +60,41 @@ setInterval(
         now = new Date(Date.now())
         clockTime.innerText = now.toLocaleTimeString()
         clockDate.innerText = now.toLocaleDateString()
-        if (mediaStream !== undefined && now.getUTCSeconds() == recordStartTime.getUTCSeconds() && !schedulerTriggered) {
+        if (mediaStream !== undefined
+            && now.getTime() - recordStartTime.getTime() <= 1000
+            && now.getTime() - recordStartTime.getTime() >= 0
+            && !schedulerTriggered) {
             recordButton.click()
             schedulerTriggered = true;
+            console.log('Scheduled recording started')
         }
-        if (mediaStream !== undefined && now.getUTCSeconds() == recordStopTime.getUTCSeconds() && schedulerTriggered) {
+        if (mediaStream !== undefined
+            && now.getTime() - recordStopTime.getTime() <= 1000
+            && now.getTime() - recordStopTime.getTime() >= 0
+            && schedulerTriggered) {
             recordButton.click()
             schedulerTriggered = false;
+            console.log('Scheduled recording stopped')
         }
     }, 1000)
 
-window.addEventListener('beforeunload', alert("HI"))
+window.addEventListener('beforeunload', function () { alert('hi'); return false; })
+window.onbeforeunload = () => alert('hi')
+document.body.onbeforeunload = () => alert('hi')
 
-recordStart.onchange = function() {
+recordStart.onchange = function () {
     recordStartTime = new Date(recordStart.value)
     status.value = 'Scheduled'
     console.log('Recording scheduled at ' + recordStartTime.toLocaleString())
 }
 
-recordStop.onchange = function() {
+recordStop.onchange = function () {
     recordStopTime = new Date(recordStop.value)
     maximumDuration.disabled = true;
+    remainingDuration.style.display = 'inline-block';
 }
 
-clearStart.onclick = function() {
+clearStart.onclick = function () {
     status.value = 'Not recording'
     if (recordStart.value !== '') {
         console.log('Scheduled recording cancelled')
@@ -89,27 +102,39 @@ clearStart.onclick = function() {
     recordStart.value = ''
 }
 
-clearStop.onclick = function() {
+clearStop.onclick = function () {
     recordStop.value = ''
     maximumDuration.disabled = false;
+    remainingDuration.style.display = 'none'
+}
+
+clearMaximumDuration.onclick = function() {
+    maximumDuration.value = ''
 }
 
 
 settingsButton.onclick = function () {
+    console.log('click')
+    console.log(settingsPanel.display)
     if (settingsPanel.style.display === 'none') {
         settingsPanel.style.display = 'block'
         logo.style.display = 'none'
+        // console.log('true')
+        // logo.style.animation = '1s logo-exit-rotate 1 cubic-bezier(0.8, 0.05, 0.795, 0.035);'
+        // logo.onanimationend = () => {logo.style.display = 'none'}
     } else if (settingsPanel.style.display === 'block') {
         settingsPanel.style.display = 'none'
-        logo.style.display = 'block'
+        // logo.style.display = 'block'
     }
 }
 
 infoButton.onclick = function () {
     if (infoPanel.style.display === 'none') {
         infoPanel.style.display = 'block'
+        logo.style.display = 'none'
     } else if (infoPanel.style.display === 'block') {
         infoPanel.style.display = 'none'
+        // logo.style.display = 'block'
     }
 }
 
@@ -144,6 +169,8 @@ recordButton.onclick = function () {
         default:
             break;
     }
+    console.log('Recording button clicked')
+    console.log('scheduler triggered ' + schedulerTriggered)
 };
 
 downloadButton.onclick = function () {
@@ -167,7 +194,7 @@ logCopy.onclick = function () {
 }
 
 logClear.onclick = function () {
-    logNode.innerHTML = '# Log'
+    logNode.innerHTML = '# Log<br>'
 }
 
 // settings
@@ -203,7 +230,8 @@ function parseOptions() {
             sampleRate: 44100,
         },
         video: {
-            cursor: 'always',
+            // cursor: String(document.getElementById('cursor').value),
+            cursor: "motion",
             frameRate: 999,
             aspectRatio: 3.2,
             height: 1080,
@@ -213,6 +241,8 @@ function parseOptions() {
             //
         }
     };
+    console.log(String(document.getElementById('cursor').value))
+    console.log(displayMediaOptions.video.cursor)
     return displayMediaOptions;
 }
 
@@ -320,16 +350,25 @@ function startRecording() {
     let startTime = Date.now()
     status.value = 'Recording'
     status.disabled = false
-    status_duration.style.display = 'inline-block'
+    statusDuration.style.display = 'inline-block'
+    remainingDuration.style.display = 'inline-block'
     timer = setInterval(function () {
         let duration = Math.floor((Date.now() - startTime) / 1000)
         if (!schedulerTriggered && maximumDuration.value != '' && duration >= Number(maximumDuration.value)) {
             recordButton.click()
         }
         let seconds = ('0' + duration % 60).slice(-2)
-        let minutes = ('0' + Math.floor(duration / 60)).slice(-2)
+        let minutes = ('0' + Math.floor((duration / 60) % 60)).slice(-2)
         let hours = Math.floor(duration / 3600)
-        status_duration.value = hours + ':' + minutes + ':' + seconds
+        statusDuration.value = hours + ':' + minutes + ':' + seconds
+        let remaining = Math.floor((maximumDuration.value != '' ?
+            maximumDuration.value - duration:
+            (recordStopTime - Date.now()) / 1000))
+        console.log(remaining)
+        let rseconds = ('0' + remaining % 60).slice(-2)
+        let rminutes = ('0' + Math.floor((remaining / 60) % 60)).slice(-2)
+        let rhours = Math.floor(remaining / 3600)
+        remainingDuration.innerHTML = '<i class="material-icons">event_busy</i><span>&nbsp;' + rhours + ':' + rminutes + ':' + rseconds + '</span>'
     }, 1000)
 }
 

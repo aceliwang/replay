@@ -21,8 +21,13 @@ h1 {
     position: relative;
   }
   
-  input {
+  input, select {
     display: inline-block;
+    text-align: center;
+    font-weight: bolder;
+    text-align-last: center;
+    /* font-size: medium; */
+    /* width: auto; */
   }
 
   input[type='button'],
@@ -35,10 +40,29 @@ h1 {
     font-weight: bolder;
     min-height: 40px;
     vertical-align: middle;
+    border-radius: 4px;
   }
 
-  label {
+  input[type='range'],
+  input[type='text'],
+  input[type='number'],
+  input[type='datetime-local'],
+  .settings_column input[type='button'],
+  select, option {
+    min-width: 210px;
+    min-height: 40px;
+    vertical-align: middle;
+    height: 26px;
+    border-radius: 4px;
+    box-shadow: none;
+    box-sizing: border-box;
+    border-width: 2px;
+  }
+
+  label,
+  #remaining span {
     display: inline-block;
+    margin: 0px;
   }
 
   /* option blocks */
@@ -51,25 +75,18 @@ h1 {
     vertical-align: middle;
     display: inline-block;
     min-width: 150px;
+    font-weight: bolder;
   }
 
   .settings_column {
-    width:45%;
-    display:inline-block;
+    width: 45%;
+    display: inline-block;
     vertical-align: top;
   }
 
   .option_blocks {
-    display: inline-block;
+    display: inline;
   }
-
-  input[type='text'] {
-    height: 26px;
-    border-radius: 4px;
-    box-shadow: none;
-    box-sizing: border-box;
-  }
-
 
   video {
     width: 100%;
@@ -95,16 +112,20 @@ h1 {
     width: 50%;
   }
 
-  #preview_panel {
-    display: none;
-  }
 
   #status_panel {
     display: inline-block;
   }
 
+  #preview_panel,
+  #settings_panel,
+  #remaining,
   #duration {
     display: none;
+  }
+
+  #remaining * {
+    vertical-align: middle;
   }
 
   #controls_panel {
@@ -120,7 +141,7 @@ h1 {
   }
 
   footer {
-    height: 19vh;
+    height: 24vh;
     /* resize: vertical; */
     /* overflow: auto; */
   }
@@ -158,18 +179,28 @@ h1 {
     /* margin: auto; */
     top: calc(50% - 20vh);
     left: calc(50% - 20vh);
-    animation-duration: 10s;
-    animation-name: slidein;
+    animation: 10s rotate infinite linear;
+    /* animation: 1s logo-exit-rotate 1 cubic-bezier(0.8, 0.05, 0.795, 0.035); */
+    /* animation-duration: 2s;
+    animation-name: logo-exit-rotate;
     animation-iteration-count: infinite;
-    animation-timing-function: linear;
+    animation-timing-function: ease-in; */
     /* animation-direction: alternate; */
   }
 
-  @keyframes slidein {
+  @keyframes rotate {
     from {
       transform: rotate(0deg);
     }
     to {
       transform: rotate(360deg);
+    }
+  }
+
+  @keyframes logo-exit-rotate {
+    to {
+      transform: rotate(360deg);
+      opacity: 0;
+      display: none;
     }
   }
