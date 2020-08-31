@@ -20,6 +20,12 @@ h1 {
     padding-bottom: 2vh;
     position: relative;
   }
+
+  button[id*='clear'],
+  button[id*='range'] {
+    color: white;
+    background-color: black;
+  }
   
   input, select {
     display: inline-block;
@@ -45,7 +51,10 @@ h1 {
 
   input[type='range'],
   input[type='text'],
-  input[type='number'],
+  /* input[type='number'], */
+  #maximum-duration, 
+  #sample-rate,
+  #sample-size,
   input[type='datetime-local'],
   .settings_column input[type='button'],
   select, option {
@@ -57,6 +66,26 @@ h1 {
     box-shadow: none;
     box-sizing: border-box;
     border-width: 2px;
+  }
+
+  input[id$='min'],
+  input[id$='max'] {
+    min-height: 40px;
+    vertical-align: middle;
+    height: 26px;
+    border-radius: 4px;
+    box-shadow: none;
+    box-sizing: border-box;
+    border-width: 2px;
+    margin-right: 2px;
+  }
+
+  input[id$='min'] {
+    width: 210px
+  }
+
+  input[id$='max'] {
+    width: 102px
   }
 
   label,
@@ -128,6 +157,10 @@ h1 {
     vertical-align: middle;
   }
 
+  #audio-metre-label {
+    vertical-align: baseline;
+  }
+
   #controls_panel {
     /* position: fixed; */
     /* top: 0px; */
@@ -150,8 +183,10 @@ h1 {
     padding: 1vh 0vh 3vh 1vh;
     height: 9vh;
     overflow: auto;
+    overflow-x: hidden;
+    word-wrap: break-word;
     width: 100%;
-    display:inline-block;
+    display: inline-block;
     /* height: inherit; */
     background-color: #eee;
     color: grey;
@@ -180,6 +215,7 @@ h1 {
     top: calc(50% - 20vh);
     left: calc(50% - 20vh);
     animation: 10s rotate infinite linear;
+    transition: 0.1s;
     /* animation: 1s logo-exit-rotate 1 cubic-bezier(0.8, 0.05, 0.795, 0.035); */
     /* animation-duration: 2s;
     animation-name: logo-exit-rotate;

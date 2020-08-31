@@ -20,10 +20,11 @@ const logNode = document.getElementById('log');
 const videoNode = document.getElementById('preview');
 const audioMetreBar = document.getElementById('metre')
 const audioMetreTitle = document.getElementById('audio-metre-label')
+const audioMetreGraph = document.getElementById('audio-metre-graph')
 const audioGain = document.getElementById('gain')
 const echoCancellation = document.getElementById('echo-cancellation')
 const noiseSuppression = document.getElementById('noise-suppression')
-const autoGainControl = document.getElementById('autogain-control')
+const autoGainControl = document.getElementById('auto-gain-control')
 const status = document.getElementById('status');
 const statusDuration = document.getElementById('duration');
 const remainingDuration = document.getElementById('remaining');
@@ -33,6 +34,16 @@ const recordStop = document.getElementById('recording-stop')
 const clearStart = document.getElementById('clear-recording-start')
 const clearStop = document.getElementById('clear-recording-stop')
 const clearMaximumDuration = document.getElementById('clear-maximum-duration')
+const recordingHeightMin = document.getElementById('recording-height-min')
+const recordingHeightMax = document.getElementById('recording-height-max')
+const rangeHeight = document.getElementById('range-recording-height')
+const clearHeight = document.getElementById('clear-recording-height')
+const recordingWidthMin = document.getElementById('recording-width-min')
+const recordingWidthMax = document.getElementById('recording-width-max')
+const rangeWidth = document.getElementById('range-recording-width')
+const clearWidth = document.getElementById('clear-recording-width')
+const aspectRatioMin = document.getElementById('aspect-ratio-min')
+const aspectRatioMax = document.getElementById('aspect-ratio-max')
 const logo = document.getElementById('logo')
 // log
 console.log = msg => { logNode.innerHTML = logNode.innerHTML + `<br># ${msg}`; logNode.scrollTop = logNode.scrollHeight; };
@@ -50,6 +61,7 @@ var url;
 var recordStartTime = new Date(0);
 var recordStopTime = new Date(0);
 var schedulerTriggered = false;
+var global = {};
 
 // init
 let now = new Date(Date.now())
@@ -78,6 +90,20 @@ setInterval(
         }
     }, 1000)
 
+console.log(JSON.stringify(navigator.mediaDevices.getSupportedConstraints()))
+for (let prop in navigator.mediaDevices.getSupportedConstraints()) {
+    // if (prop)
+    try {
+        let setting = prop.split(/([A-Z][a-z]+)/).filter(function (e) { return e }).map(e => e.toLowerCase()).join('-')
+        document.getElementById(
+            ((setting) != 'height' && (setting) != 'width' && (setting) != 'aspect-ratio') ?
+                setting : ((setting) == 'aspect-ratio' ?
+                    'aspect-ratio-min' : ('recording-' + setting + '-min'))).disabled = false
+    } catch {
+
+    }
+}
+
 window.addEventListener('beforeunload', function () { alert('hi'); return false; })
 window.onbeforeunload = () => alert('hi')
 document.body.onbeforeunload = () => alert('hi')
@@ -88,10 +114,27 @@ recordStart.onchange = function () {
     console.log('Recording scheduled at ' + recordStartTime.toLocaleString())
 }
 
+recordStart.onclick = function () {
+    let max = new Date();
+    let s = (time) => { return ("0" + time).slice(-2) };
+    this.min = max.getFullYear() + "-" + s(max.getMonth() + 1) + "-" + s(max.getDate()) + "T" + s(max.getHours()) + ":" + s(max.getMinutes())
+}
+
 recordStop.onchange = function () {
     recordStopTime = new Date(recordStop.value)
     maximumDuration.disabled = true;
     remainingDuration.style.display = 'inline-block';
+}
+
+recordStop.onclick = function () {
+    let max;
+    if (recordStart.value == '') {
+        max = new Date();
+    } else {
+        max = new Date(recordStart.value)
+    }
+    let s = (time) => { return ("0" + time).slice(-2) };
+    this.min = max.getFullYear() + "-" + s(max.getMonth() + 1) + "-" + s(max.getDate()) + "T" + s(max.getHours()) + ":" + s(max.getMinutes())
 }
 
 clearStart.onclick = function () {
@@ -108,33 +151,123 @@ clearStop.onclick = function () {
     remainingDuration.style.display = 'none'
 }
 
-clearMaximumDuration.onclick = function() {
+clearMaximumDuration.onclick = function () {
     maximumDuration.value = ''
 }
 
+clearHeight.onclick = function () {
+    recordingHeightMin.value = ''
+    recordingHeightMax.value = ''
+    disableAspectRatio()
+}
+
+clearWidth.onclick = function () {
+    recordingWidthMin.value = ''
+    recordingWidthMax.value = ''
+    disableAspectRatio()
+}
+
+rangeHeight.onclick = function () {
+    if (recordingHeightMax.style.display == 'none') {
+        recordingHeightMax.style.display = 'inline'
+        recordingHeightMax.disabled = false
+        recordingHeightMin.style.width = '102px'
+        rangeHeight.style.color = 'black'
+        rangeHeight.style.backgroundColor = 'white'
+        recordingHeightMin.placeholder = 'Min'
+    } else {
+        recordingHeightMax.style.display = 'none'
+        recordingHeightMax.disabled = true
+        recordingHeightMin.style.width = '210px'
+        recordingHeightMin.placeholder = ''
+        rangeHeight.style.color = 'white'
+        rangeHeight.style.backgroundColor = 'black'
+    }
+}
+
+rangeWidth.onclick = function () {
+    if (recordingWidthMax.style.display == 'none') {
+        recordingWidthMax.style.display = 'inline'
+        recordingWidthMax.disabled = false
+        recordingWidthMin.style.width = '102px'
+        rangeWidth.style.color = 'black'
+        rangeWidth.style.backgroundColor = 'white'
+        recordingWidthMin.placeholder = 'Min'
+    } else {
+        recordingWidthMax.style.display = 'none'
+        recordingWidthMax.disabled = true
+        recordingWidthMin.style.width = '210px'
+        recordingWidthMin.placeholder = ''
+        rangeWidth.style.color = 'white'
+        rangeWidth.style.backgroundColor = 'black'
+    }
+}
+
+
+let disableAspectRatio = function () {
+    console.log('fire')
+    console.log('Hmax' + recordingHeightMax.value)
+    console.log('Hmin' + recordingHeightMin.value)
+    console.log('Wmax' + recordingWidthMax.value)
+    console.log('Wmin' + recordingWidthMin.value)
+    if ((recordingHeightMin.value == '' && recordingHeightMax.value == '') ||
+        (recordingWidthMin.value == '' && recordingWidthMax.value == '')) {
+        aspectRatioMin.disabled = false
+        aspectRatioMax.disabled = false
+    } else {
+        aspectRatioMin.disabled = true
+        aspectRatioMax.disabled = true
+    }
+    // if (recordingHeightMax.value != '' &&
+    //     recordingHeightMin.value != '' &&
+    //     recordingWidthMax.value != '' &&
+    //     recordingWidthMin.value != '') {
+    //     console.log('true')
+    //     aspectRatioMin.disabled = false
+    //     aspectRatioMax.disabled = false
+    // } else {
+    //     aspectRatioMin.disabled = true
+    //     aspectRatioMax.disabled = true
+    // }
+}
+
+recordingHeightMin.oninput = () => disableAspectRatio()
+recordingHeightMax.oninput = () => disableAspectRatio()
+recordingWidthMin.oninput = () => disableAspectRatio()
+recordingWidthMax.oninput = () => disableAspectRatio()
 
 settingsButton.onclick = function () {
-    console.log('click')
-    console.log(settingsPanel.display)
     if (settingsPanel.style.display === 'none') {
         settingsPanel.style.display = 'block'
-        logo.style.display = 'none'
+        // logo.style.display = 'none'
+        logo.style.height = 0
+        logo.style.top = '50%'
         // console.log('true')
         // logo.style.animation = '1s logo-exit-rotate 1 cubic-bezier(0.8, 0.05, 0.795, 0.035);'
         // logo.onanimationend = () => {logo.style.display = 'none'}
     } else if (settingsPanel.style.display === 'block') {
         settingsPanel.style.display = 'none'
         // logo.style.display = 'block'
+        if (previewPanel.style.display != 'block' && infoPanel.style.display == 'none') {
+            logo.style.height = '40vh'
+            logo.style.top = 'calc(50% - 20vh)'
+        }
     }
 }
 
 infoButton.onclick = function () {
     if (infoPanel.style.display === 'none') {
         infoPanel.style.display = 'block'
-        logo.style.display = 'none'
+        // logo.style.display = 'none'
+        logo.style.height = 0
+        logo.style.top = '50%'
     } else if (infoPanel.style.display === 'block') {
         infoPanel.style.display = 'none'
         // logo.style.display = 'block'
+        if (previewPanel.style.display != 'block' && settingsPanel.style.display == 'none') {
+            logo.style.height = '40vh'
+            logo.style.top = 'calc(50% - 20vh)'
+        }
     }
 }
 
@@ -203,8 +336,12 @@ settingsToggles.forEach(function (item) {
     item.onclick = function () {
         if (item.value === 'On') {
             item.value = 'Off'
+            item.style.backgroundColor = 'black'
+            item.style.color = 'white'
         } else {
             item.value = 'On'
+            item.style.backgroundColor = 'white'
+            item.style.color = 'black'
         }
         console.log(item.id + ' turned ' + item.value)
     }
@@ -231,18 +368,23 @@ function parseOptions() {
         },
         video: {
             // cursor: String(document.getElementById('cursor').value),
-            cursor: "motion",
+            // cursor: "motion",
             frameRate: 999,
-            aspectRatio: 3.2,
-            height: 1080,
-            width: 960,
+            aspectRatio: 18,
+            height: 700,
+            width: 600,
+            zoom: 1,
+            // CAMERA
+            // if width OR height OR aspectRatio (single): all good
+            // if 
+            // if (width AND height)
             // MONITOR
             // if width + height + aspectRatio: width takes priority, then width, aspect ratio is calculated
             //
         }
     };
-    console.log(String(document.getElementById('cursor').value))
-    console.log(displayMediaOptions.video.cursor)
+    console.log('form' + String(document.getElementById('cursor').value))
+    console.log('seen' + displayMediaOptions.video.cursor)
     return displayMediaOptions;
 }
 
@@ -256,26 +398,37 @@ function logInfo() {
 
 function audioMetre() {
     try {
-        let audioCtx = new window.AudioContext();
-        let analyser = audioCtx.createAnalyser();
-        let stream = audioCtx.createMediaStreamSource(mediaStream);
-        stream.connect(analyser);
-        analyser.fftSize = 2048;
-        let bufferLength = analyser.frequencyBinCount;
+        delete global.audioCtx;
+        delete global.analyser;
+        delete global.stream;
+        global.audioCtx = new window.AudioContext();
+        global.analyser = global.audioCtx.createAnalyser();
+        global.stream = global.audioCtx.createMediaStreamSource(mediaStream);
+        global.stream.connect(global.analyser);
+        global.analyser.fftSize = 2048;
+        let bufferLength = global.analyser.frequencyBinCount;
         let dataArray = new Uint8Array(bufferLength);
         audioMetreTitle.innerHTML = audioMetreTitleOriginal
         audioMetreTitle.style.display = 'block'
         audioMetreTitle.onclick = () => null
+        let graphArray = new Array(50).fill(0)
         setInterval(function () {
-            analyser.getByteTimeDomainData(dataArray)
+            // console.log(graphArray)
+            global.analyser.getByteTimeDomainData(dataArray)
             let max = dataArray.sort()[dataArray.length - 1]
             audioMetreBar.style.width = Math.min(1, audioGain.value * (max - 128) / 128) * videoNode.clientWidth + 'px'
+            // graphArray.shift()
+            // graphArray.push(max)
+            // arrayText = graphArray.map((value, index) => {return (index == 0 ? 'M' : 'L') + index  + ' ' + value})
+            // audioMetreGraph.setAttribute('d', 'M 0 0 l 1 ' + arrayText.join(' l 1 ') + ' Z')
+
         }
             , 50)
     } catch (error) {
         if (error.name === 'InvalidStateError') {
-            audioMetreTitle.innerHTML = 'No audio track selected. Click to hide.'
+            audioMetreTitle.innerHTML = 'No audio track selected.&nbsp;<i class="material-icons">delete_forever</i>'
             audioMetreTitle.onclick = () => audioMetreTitle.style.display = 'none'
+            audioMetreBar.style.width = '0px'
             console.log('Nil audio recorded.')
         } else {
             console.log(error)
@@ -351,7 +504,9 @@ function startRecording() {
     status.value = 'Recording'
     status.disabled = false
     statusDuration.style.display = 'inline-block'
-    remainingDuration.style.display = 'inline-block'
+    if (maximumDuration.value || recordStop.value) {
+        remainingDuration.style.display = 'inline-block'
+    }
     timer = setInterval(function () {
         let duration = Math.floor((Date.now() - startTime) / 1000)
         if (!schedulerTriggered && maximumDuration.value != '' && duration >= Number(maximumDuration.value)) {
@@ -361,14 +516,16 @@ function startRecording() {
         let minutes = ('0' + Math.floor((duration / 60) % 60)).slice(-2)
         let hours = Math.floor(duration / 3600)
         statusDuration.value = hours + ':' + minutes + ':' + seconds
-        let remaining = Math.floor((maximumDuration.value != '' ?
-            maximumDuration.value - duration:
-            (recordStopTime - Date.now()) / 1000))
-        console.log(remaining)
-        let rseconds = ('0' + remaining % 60).slice(-2)
-        let rminutes = ('0' + Math.floor((remaining / 60) % 60)).slice(-2)
-        let rhours = Math.floor(remaining / 3600)
-        remainingDuration.innerHTML = '<i class="material-icons">event_busy</i><span>&nbsp;' + rhours + ':' + rminutes + ':' + rseconds + '</span>'
+        if (maximumDuration.value || recordStop.value) {
+            let remaining = Math.floor((maximumDuration.value != '' ?
+                maximumDuration.value - duration :
+                (recordStopTime - Date.now()) / 1000))
+            console.log(remaining)
+            let rseconds = ('0' + remaining % 60).slice(-2)
+            let rminutes = ('0' + Math.floor((remaining / 60) % 60)).slice(-2)
+            let rhours = Math.floor(remaining / 3600)
+            remainingDuration.innerHTML = '<i class="material-icons">event_busy</i><span>&nbsp;' + rhours + ':' + rminutes + ':' + rseconds + '</span>'
+        }
     }, 1000)
 }
 
@@ -384,10 +541,7 @@ function stopRecording() {
 function downloadRecording() {
 
     const a = document.createElement('a');
-    let name = document.getElementById('download-name').value
-    if (name === '') {
-        name = 'Video'
-    }
+    let name = (name == '') ? 'Video' : document.getElementById('download-name').value
     a.style.display = 'none';
     a.href = url;
     a.download = name + '.webm';

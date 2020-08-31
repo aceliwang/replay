@@ -72,7 +72,7 @@
                             <input id='cursor-never' name='cursor' type='radio' value='never' />
                             <label for='cursor-never'>Never: cursor is never visible</label><br>
                         </div> -->
-                        <select id='cursor'>
+                        <select id='cursor' disabled>
                             <option value='always'>Always</option>
                             <option value='motion'>When moving</option>
                             <option value='never'>Never</option>
@@ -83,8 +83,13 @@
                         <input id='download-name' type='text' placeholder='Video' />
                     </div>
                     <div>
-                        <label for='aspect-ratio'>Aspect Ratio</label>
-                        <input id='aspect-ratio' type='range' />
+                        <label for='aspect-ratio-min'>Aspect Ratio</label>
+                        <input id='aspect-ratio-min' type='number' disabled/>
+                        <input id='aspect-ratio-max' type='number' disabled/>
+                        <button disabled>1:1</button>
+                        <button>4:3</button>
+                        <button>16:9</button>
+                        <button>16:10</button>
                         https://webdevtrick.com/javascript-price-range-slider/
                     </div>
                     <!-- <div>
@@ -93,15 +98,21 @@
                 </div> -->
                     <div>
                         <label for='frame-rate'>Frame Rate</label>
-                        <input id='frame-rate' type='range' />
+                        <input id='frame-rate' type='range' disabled/>
                     </div>
                     <div>
-                        <label for='recording-height'>Video Height</label>
-                        <input id='recording-height' type='range'>Height</input>
+                        <label for='recording-height-min'>Video Height</label>
+                        <input id='recording-height-min' type='number' disabled placeholder=''/>
+                        <input id='recording-height-max' type='number' disabled placeholder='Max' style='display:none'/>
+                        <button id='range-recording-height'>Range</button>
+                        <button id='clear-recording-height'>Clear</button>
                     </div>
                     <div>
-                        <label for='recording-width'>Video Width</label>
-                        <input id='recording-width' type='range'>Width</input>
+                        <label for='recording-width-min'>Video Width</label>
+                        <input id='recording-width-min' type='number' disabled/>
+                        <input id='recording-width-max' type='number' disabled placeholder='Max' style='display:none'/>
+                        <button id='range-recording-width'>Range</button>
+                        <button id='clear-recording-width'>Clear</button>
                     </div>
                     <div>
                         <label for='maximum-duration'>Duration (sec)</label>
@@ -126,20 +137,23 @@
                     <h2>Audio</h2>
                     <div>
                         <label for='echo-cancellation'>Echo Cancellation</label>
-                        <input id='echo-cancellation' type='button' value='On' />
+                        <input id='echo-cancellation' type='button' value='On' disabled/>
                     </div>
                     <div>
                         <label for='noise-suppression'>Noise Suppression</label>
-                        <input id='noise-suppression' type='button' value='On' />
+                        <input id='noise-suppression' type='button' value='On' disabled/>
                     </div>
                     <div>
-                        <label for='autogain-control'>Auto Gain Control</label>
-                        <input id='autogain-control' type='button' value='On' />
+                        <label for='auto-gain-control'>Auto Gain Control</label>
+                        <input id='auto-gain-control' type='button' value='On' disabled/>
                     </div>
                     <div>
-                        Sample Rate
-                        Sample Size
-                        Volume
+                        <label for='sample-rate'>Sample Rate (Hz)</label>
+                        <input id='sample-rate' type='number' min='0' disabled/>
+                    </div>
+                    <div>
+                        <label for='sample-size'>Sample Size (bytes)</label>
+                        <input id='sample-size' type='number' min='0' disabled>
                     </div>
                     <h2>Scheduling</h2>
                     <div>
@@ -149,11 +163,7 @@
                     </div>
                     <div>
                         <label for='recording-stop'>Recording Stop</label>
-                        <input id='recording-stop' type='datetime-local' onclick='
-                        let max = new Date();
-                        let s = (time) => {return ("0" + time).slice(-2)}; 
-                        this.min = max.getFullYear() + "-" + s(max.getMonth() + 1) + "-" + s(max.getDate()) + "T" + s(max.getHours()) + ":" + s(max.getMinutes()) + ":" + s(max.getSeconds())
-                    '>
+                        <input id='recording-stop' type='datetime-local' >
                         <button id='clear-recording-stop'>Clear</button>
                     </div>
                 </div>
@@ -167,6 +177,11 @@
             </div>
             <h2 id='audio-metre-label'>Audio Meter <input id='gain' type='range' min='0' max='10' step='0.1' /></h2>
             <div id='metre' style='width: 0px'></div>
+            <!-- <div id='audio-metre-graph-1' style='display:block'>
+                <svg width='500px' height='500px'>
+                    <path id='audio-metre-graph' d='M 0 0' stroke='black'></path>
+                </svg>
+            </div> -->
         </div>
 
         <div id='info_panel' style='display:none'>
@@ -187,9 +202,10 @@
             <li>Post-editing</li>
             <li>Add a closing notification</li>
             <li>Video Settings</li>
-            <li>Fix audio metre for switch from camera to screen input</li>
+            <li>Change video resizing function</li>
             <li>Audio graph over time</li>
             <li>Keyboard shortcuts</li>
+            <li>Resize log</li>
             <li>Add aniamtions: https://css-tricks.com/controlling-css-animations-transitions-javascript/</li>
         </div>
         <svg id='logo'>
