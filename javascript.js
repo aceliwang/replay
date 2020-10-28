@@ -15,6 +15,7 @@ const settingsPanel = document.getElementById('settings_panel')
 const infoPanel = document.getElementById('info_panel')
 const clockDate = document.getElementById('clock-date')
 const clockTime = document.getElementById('clock-time')
+const title = document.querySelector('title')
 // components + forms
 const logNode = document.getElementById('log');
 const videoNode = document.getElementById('preview');
@@ -44,6 +45,7 @@ const rangeWidth = document.getElementById('range-recording-width')
 const clearWidth = document.getElementById('clear-recording-width')
 const aspectRatioMin = document.getElementById('aspect-ratio-min')
 const aspectRatioMax = document.getElementById('aspect-ratio-max')
+const aspectRatioOptions = document.getElementsByClassName('aspect-ratio-options')
 const logo = document.getElementById('logo')
 // log
 console.log = msg => { logNode.innerHTML = logNode.innerHTML + `<br># ${msg}`; logNode.scrollTop = logNode.scrollHeight; };
@@ -90,7 +92,11 @@ setInterval(
         }
     }, 1000)
 
-console.log(JSON.stringify(navigator.mediaDevices.getSupportedConstraints()))
+let supportedConstraints = navigator.mediaDevices.getSupportedConstraints()
+console.log('Supported constraints are as follows: ')
+for (i in supportedConstraints) {
+    console.log('&nbsp;&nbsp;&nbsp;&nbsp;' + i + ': ' + supportedConstraints[i])
+}
 for (let prop in navigator.mediaDevices.getSupportedConstraints()) {
     // if (prop)
     try {
@@ -111,6 +117,7 @@ document.body.onbeforeunload = () => alert('hi')
 recordStart.onchange = function () {
     recordStartTime = new Date(recordStart.value)
     status.value = 'Scheduled'
+    title.innerText = '[SCHEDULED] Replay'
     console.log('Recording scheduled at ' + recordStartTime.toLocaleString())
 }
 
@@ -139,6 +146,7 @@ recordStop.onclick = function () {
 
 clearStart.onclick = function () {
     status.value = 'Not recording'
+    title.innerText = '[NOT REC] Replay'
     if (recordStart.value !== '') {
         console.log('Scheduled recording cancelled')
     }
@@ -236,6 +244,11 @@ recordingHeightMax.oninput = () => disableAspectRatio()
 recordingWidthMin.oninput = () => disableAspectRatio()
 recordingWidthMax.oninput = () => disableAspectRatio()
 
+for (let i = 0; i < 4; i++) {
+    console.log('hi' + aspectRatioOptions[i].value)
+    aspectRatioOptions[i].onclick = function() {aspectRatioMin.value = aspectRatioOptions[i].value}
+}
+
 settingsButton.onclick = function () {
     if (settingsPanel.style.display === 'none') {
         settingsPanel.style.display = 'block'
@@ -299,6 +312,7 @@ recordButton.onclick = function () {
             downloadButton.disabled = false;
             settingsButton.disabled = false;
             status.value = 'Recording stopped'
+            title.innerText = '[NOT REC] Replay'
         default:
             break;
     }
@@ -364,16 +378,15 @@ function parseOptions() {
             echoCancellation: parseValue(echoCancellation),
             noiseSuppression: parseValue(noiseSuppression),
             autoGainControl: parseValue(autoGainControl),
-            sampleRate: 44100,
+            // sampleRate: 44100,
         },
         video: {
             // cursor: String(document.getElementById('cursor').value),
             // cursor: "motion",
-            frameRate: 999,
-            aspectRatio: 18,
-            height: 700,
-            width: 600,
-            zoom: 1,
+            // frameRate: 999,
+            // aspectRatio: 18,
+            // height: 700,
+            // width: 600,
             // CAMERA
             // if width OR height OR aspectRatio (single): all good
             // if 
@@ -390,7 +403,12 @@ function parseOptions() {
 
 function logInfo() {
     let videoTrack = videoNode.srcObject.getVideoTracks()[0];
-    console.info(JSON.stringify(videoTrack.getSettings(), null, 2));
+    let videoTrackSettings = videoTrack.getSettings();
+    // console.info(JSON.stringify(videoTrack.getSettings(), null, 2));
+    for (i in videoTrackSettings) {
+        console.log(i)
+        console.info(i + ": " + videoTrackSettings)
+    }
     console.info('Track settings:');
     console.info(JSON.stringify(videoTrack.getConstraints(), null, 2));
     console.info('Track constraints:');
@@ -466,12 +484,14 @@ async function startCapture(displayMediaOptions, type) {
         }
         logInfo();
         previewPanel.style.display = 'block';
+        logo.style.display = 'none';
         console.log(type + ' capture set up.')
         if (type == 'camera') {
 
         }
         recordButton.disabled = false;
         status.value = 'Not recording'
+        title.innerText = '[NOT REC] Replay'
     } catch (error) {
         if (error.name === 'NotAllowedError') {
             console.log('Capture permission denied.')
@@ -502,6 +522,7 @@ function startRecording() {
     console.log('Recording started.');
     let startTime = Date.now()
     status.value = 'Recording'
+    title.innerText = '[RECORDING] Replay'
     status.disabled = false
     statusDuration.style.display = 'inline-block'
     if (maximumDuration.value || recordStop.value) {
@@ -535,13 +556,15 @@ function stopRecording() {
     clearInterval(timer);
     status.innerHTML = 'Recording stopped. ' + status.innerHTML
     status.value = 'Not recording'
+    title.innerText = '[NOT REC] Replay'
     status.disabled = true
 }
 
 function downloadRecording() {
 
     const a = document.createElement('a');
-    let name = (name == '') ? 'Video' : document.getElementById('download-name').value
+    let name = document.getElementById('download-name').value
+    name = (name == '') ? 'Video' : name
     a.style.display = 'none';
     a.href = url;
     a.download = name + '.webm';
